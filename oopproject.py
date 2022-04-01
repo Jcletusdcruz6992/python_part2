@@ -41,7 +41,7 @@ class Deck:
     have a method for splitting/cutting the deck in half and Shuffling the deck.
     """
     def __init__(self):
-        self.allcards=[(s,r) for s SUITE for r in RANKS]
+        self.allcards=[(s,r) for s in  SUITE for r in RANKS]
     def shuffle(self):
         print('Shuffling Card')
         shuffle(self.allcards)
@@ -67,8 +67,27 @@ class Player:
     This is the Player class, which takes in a name and an instance of a Hand
     class object. The Payer can then play cards and check if they still have cards.
     """
-    pass
+    def __init__(self,name,hand):
+        self.name=name
+        self.hand=hand
 
+    def play_card(self):
+        drawn_card=self.hand.remove_card()
+        print("{}has placed: {}".format(self.name,drawn_card))
+        print('\n')
+        return drawn_card
+
+    def remove_war_cards(self):
+        war_cards=[]
+        if len(self.hand.cards)<3:
+            return self.hand.cards
+        else:
+            for x in range(3):
+                war_cards.append(self.hand.cards.pop())
+                return war_cards
+
+    def still_has_cards(self):
+        return len(self.hand.cards)!=0
 
 ######################
 #### GAME PLAY #######
@@ -76,3 +95,49 @@ class Player:
 print("Welcome to War, let's begin...")
 
 # Use the 3 classes along with some logic to play a game of war!
+d=Deck()
+d.shuffle()
+half1,half2=d.split_in_half()
+
+comp=Player('Computer',Hand(half1))
+
+name=input('What is your name')
+user=Player(name,Hand(half2))
+
+totoal_rounds=0
+war_count=0
+
+while user.still_has_cards and comp.still_has_cards:
+    totoal_rounds+=1
+    print('Time for a new round')
+    print('Here are the standings')
+    print(user.name+"has the count:"+str(len(user.hand.cards)))
+    print(comp.name+"has the count:"+str(len(comp.hand.cards)))
+    print('Play a card')
+    table_cards=[]
+    c_card=comp.play_card()
+    p_card=user.play_card()
+    table_cards.append(c_card)
+    table_cards.append(p_card)
+
+    if(c_card[1]==p_card[1]):
+        war_count+=1
+        print(war)
+        table_cards.extend(user.remove_war_cards())
+        table_cards.extend(comp.remove_war_cards())
+
+        if RANKS.index(c_card[1])<RANKS.index(p_card[1]):
+            user.hand.add(table_cards)
+
+        else:
+            comp.hand.add(table_cards)
+    else:
+         if RANKS.index(c_card[1])<RANKS.index(p_card[1]):
+             user.hand.add(table_cards)
+
+         else:
+             comp.hand.add(table_cards)
+
+
+print('game over,number of rounds'+str(totoal_rounds))
+print('war happened '+str(war_count)+"times")
